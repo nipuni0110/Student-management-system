@@ -40,6 +40,7 @@ data_frame = ctk.CTkFrame(win, corner_radius=10, fg_color="lightblue", width=810
 data_frame.place(x=475, y=90)
 
 # Variables
+
 rollno = ""
 name = ""
 class_var = ""
@@ -215,17 +216,14 @@ def delete_student():
 
 # Function to clear the form
 def clear_form():
-    global rollno, name, class_var, contact, section, parentname, address, gender, dob
-    rollno = ""
-    name = ""
-    class_var = ""
-    contact = ""
-    section = ""
-    parentname = ""
-    address = ""
-    gender = ""
-    dob = ""
-    set_values()
+    rollno_ent.delete(0, ctk.END)
+    name_ent.delete(0,ctk.END)
+    class_ent.delete(0,ctk.END)
+    contact_ent.delete(0,ctk.END)
+    section_ent.delete(0,ctk.END)
+    parentname_ent.delete(0,ctk.END)
+    address_ent.delete(0,ctk.END)
+    dob_ent.delete(0,ctk.END)
 
 # Function to search student details in the database
 def search_student():
@@ -260,17 +258,13 @@ clear_btn = ctk.CTkButton(detail_frame, text="Clear", command=clear_form)
 clear_btn.grid(row=10, column=1, padx=2, pady=2)
 
 # Table Frame
-table_frame = ctk.CTkFrame(data_frame, corner_radius=6, fg_color="lightblue", width=790, height=1000)
+table_frame = ctk.CTkFrame(data_frame, corner_radius=6, fg_color="lightblue", width=850, height=1000)
 table_frame.place(x=10, y=10)
 
-# Scrollbar
-scrollbar_x = ctk.CTkScrollbar(table_frame, orientation="horizontal")
-scrollbar_y = ctk.CTkScrollbar(table_frame, orientation="vertical")
 
 # Table
-student_table = ttk.Treeview(table_frame, columns=("rollno", "name", "class", "contact", "section", "parentname", "address", "gender", "dob"), xscrollcommand=scrollbar_x.set, yscrollcommand=scrollbar_y.set)
-scrollbar_x.configure(command=student_table.xview)
-scrollbar_y.configure(command=student_table.yview)
+student_table = ttk.Treeview(table_frame, columns=("rollno", "name", "class", "contact", "section", "parentname", "address", "gender", "dob"),height=30, selectmode="extended")
+
 
 student_table.heading("rollno", text="Roll No")
 student_table.heading("name", text="Name")
@@ -289,14 +283,16 @@ student_table.column("name", width=100)
 student_table.column("class", width=100)
 student_table.column("contact", width=100)
 student_table.column("section", width=100)
-student_table.column("parentname", width=150)
+student_table.column("parentname", width=100)
 student_table.column("address", width=200)
-student_table.column("gender", width=100)
-student_table.column("dob", width=100)
+student_table.column("gender", width=50)
+student_table.column("dob", width=130)
 
 student_table.pack(fill="both", expand=True)
-scrollbar_x.pack(side="bottom", fill="x")
-scrollbar_y.pack(side="right", fill="y")
+
+vertical_scrollbar = ttk.Scrollbar(master=table_frame, orient="vertical", command=student_table.yview)
+vertical_scrollbar.place(x=955, y=10, height=610)
+
 
 # Search frame
 search_frame=ctk.CTkFrame(data_frame, corner_radius=6, fg_color="lightblue", width=1000, height=510)
