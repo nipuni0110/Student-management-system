@@ -149,9 +149,25 @@ def fetch_data():
             student_table.insert('', 'end', values=row)
     conn.close()
 
-# Function to add student details to the database
+# Validate input for error handling
+
+def validate_input(rollno, name, class_var, contact, section, parentname, address, gender, dob):
+    if not rollno or not name or not class_var or not contact or not section or not parentname or not address or not gender or not dob:
+        raise ValueError("All fields are required and cannot be empty.")
+    
+def validate_update_input(rollno):
+    if not rollno:
+        raise ValueError("Roll number is required for updating a student record.")
+
+# Function to add student details to the database   
 def add_student():
     get_values()
+    try:
+        # Validate input data before proceeding
+        validate_input(rollno, name, class_var, contact, section, parentname, address, gender, dob)
+    except ValueError as e:
+        messagebox.showerror("Validation Error", str(e))
+        return
     conn = sqlite3.connect("data.db")
     cursor = conn.cursor()
     data_insert_query = '''INSERT INTO student_details (rollno, name, class, contact, section, parentname, address, gender, dob) 
@@ -170,8 +186,34 @@ def add_student():
 # Function to update student details in the database
 def update_student():
     get_values()
+    try:
+        # Validate input data before proceeding
+        validate_update_input(rollno)
+    except ValueError as e:
+        messagebox.showerror("Validation Error", str(e))
+        return
     conn = sqlite3.connect("data.db")
     cursor = conn.cursor()
+
+    # Fetch the current record
+    cursor.execute("SELECT * FROM student_details WHERE rollno = ?", (rollno,))
+    current_record = cursor.fetchone()
+    
+    if not current_record:
+        messagebox.showwarning("Warning", "Roll number not found. Update failed.")
+        conn.close()
+        return
+
+    # Map the current record to variables if fields are empty or None
+    updated_name = name if name else current_record[1]
+    updated_class = class_var if class_var else current_record[2]
+    updated_contact = contact if contact else current_record[3]
+    updated_section = section if section else current_record[4]
+    updated_parentname = parentname if parentname else current_record[5]
+    updated_address = address if address else current_record[6]
+    updated_gender = gender if gender else current_record[7]
+    updated_dob = dob if dob else current_record[8]
+
     data_update_query = '''UPDATE student_details SET 
                             name = ?, 
                             class = ?, 
@@ -182,7 +224,7 @@ def update_student():
                             gender = ?, 
                             dob = ? 
                           WHERE rollno = ?'''
-    data_update_tuple = (name, class_var, contact, section, parentname, address, gender, dob, rollno)
+    data_update_tuple = (updated_name, updated_class, updated_contact, updated_section, updated_parentname, updated_address, updated_gender, updated_dob, rollno)
     try:
         cursor.execute(data_update_query, data_update_tuple)
         conn.commit()
@@ -224,6 +266,7 @@ def clear_form():
     parentname_ent.delete(0,ctk.END)
     address_ent.delete(0,ctk.END)
     dob_ent.delete(0,ctk.END)
+    search_entry.delete(0,ctk.END)
 
 # Function to search student details in the database
 def search_student():
